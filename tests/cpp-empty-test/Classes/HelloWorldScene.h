@@ -21,6 +21,9 @@ protected:
     virtual bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *evt) override;
     virtual void onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *evt) override;
     virtual void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *evt) override;
+    
+private:
+    void createBox(const cocos2d::Vec3& pos);
 protected:
     void initScene();
 private:

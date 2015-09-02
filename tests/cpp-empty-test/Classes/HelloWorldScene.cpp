@@ -171,90 +171,152 @@ void HelloWorld::onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *evt)
 {
     //_isMoving = false;
     //MOVESCALE *= 2;
+    auto transform = _camera->getNodeToWorldTransform();
+    Vec3 pos(0,0,0);
+    transform.transformPoint(&pos);
+    Vec3 dir(0,0,-1);
+    transform.transformVector(&dir);
+    Ray ray(pos, dir);
+    Vec3 intersectPoint;
+    createBox(pos + dir * 10);
+//    if(_terrain && _terrain->getIntersectionPoint(ray, intersectPoint))
+//    {
+//        createBox(intersectPoint);
+//    }
+    
 }
 
 void HelloWorld::initScene()
 {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     auto vp = Camera::getDefaultViewport();
-    auto sceneNode = CSLoader::createNode("res/Scene3DNoParticle.csb");
-    sceneNode->setCameraMask((unsigned short)CameraFlag::USER1, true);
-    addChild(sceneNode);
-    _headNode = sceneNode->getChildByTag(57);
+    _headNode = Node::create();
     
-    {
-        _originalHeadRotation = _headNode->getNodeToParentTransform();
-        _originalHeadRotation.getTranslation(&_originalTranslation);
-        Quaternion q;
-        _originalHeadRotation.getRotation(&q);
-        Mat4::createRotation(q, &_originalHeadRotation);
-        Vec3 forward(0,0,-1);
-        _originalHeadRotation.transformVector(&forward);
-        forward.y = 0;
-        forward.normalize();
-        Mat4::createLookAt(Vec3::ZERO, forward, Vec3(0,1,0), &_originalHeadRotation);
-        
-    }
+    //use custom camera
+    _camera = Camera::createPerspective(60,visibleSize.width/visibleSize.height,0.1f,800);
+    _camera->setCameraFlag(CameraFlag::USER1);
+    _camera->setPosition3D(Vec3(-1,1.6f,4));
+    _camera->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
+    _camera->setViewport(experimental::Viewport(vp._left,vp._bottom, vp._width, vp._height));
+    _headNode->addChild(_camera);
+    addChild(_headNode);
     
-    {
-        _camera = Camera::createPerspective(60,visibleSize.width/visibleSize.height * 0.5,0.1f,800);
-        _camera->setCameraFlag(CameraFlag::USER1);
-        //
-        //        _camera->setPosition3D(Vec3(-0.01,0,0));
-        _camera->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
-        _camera->setViewport(experimental::Viewport(vp._left,vp._bottom, vp._width/2, vp._height));
-        _headNode->addChild(_camera);
-        
-        _camera2 = Camera::createPerspective(60,visibleSize.width/visibleSize.height * 0.5,0.1f,800);
-        _camera2->setCameraFlag(CameraFlag::USER1);
-        //
-        //        _camera->setPosition3D(Vec3(-0.01,0,0));
-        _camera2->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
-        _camera2->setViewport(experimental::Viewport(vp._left + vp._width/2,vp._bottom, vp._width/2, vp._height));
-        _headNode->addChild(_camera2);
-    }
+        {
+            _originalHeadRotation = _headNode->getNodeToParentTransform();
+            _originalHeadRotation.getTranslation(&_originalTranslation);
+            Quaternion q;
+            _originalHeadRotation.getRotation(&q);
+            Mat4::createRotation(q, &_originalHeadRotation);
+            Vec3 forward(0,0,-1);
+            _originalHeadRotation.transformVector(&forward);
+            forward.y = 0;
+            forward.normalize();
+            Mat4::createLookAt(Vec3::ZERO, forward, Vec3(0,1,0), &_originalHeadRotation);
+            
+        }
     
-    //add skybox
-    {
-        auto textureCube = TextureCube::create("skybox/left.jpg", "skybox/right.jpg",
-                                           "skybox/top.jpg", "skybox/bottom.jpg",
-                                           "skybox/front.jpg", "skybox/back.jpg");
-        auto skyBox = Skybox::create();
-        skyBox->retain();
-        
-        skyBox->setTexture(textureCube);
-        addChild(skyBox);
-        skyBox->setCameraMask((unsigned short)CameraFlag::USER1);
-    }
+    Terrain::DetailMap r("TerrainTest/dirt.jpg"),g("TerrainTest/Grass2.jpg"),b("TerrainTest/road.jpg"),a("TerrainTest/GreenSkin.jpg");
     
-    //add label
-    {
-        auto label = Label::createWithSystemFont("", "Arial", 8);
-        label->setAnchorPoint(Vec2(0, 1.0));
-        label->setPosition(0, visibleSize.height);
-        //label->setCameraMask((unsigned short)CameraFlag::USER2);
-        _movementLabel = label;
-        addChild(label);
-        
-//        auto camera = Camera::createPerspective(60,visibleSize.width/visibleSize.height * 0.5,0.1f,800);
-//        camera->setCameraFlag(CameraFlag::USER2);
-//        camera->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
-//        camera->setViewport(experimental::Viewport(vp._left,vp._bottom, vp._width/2, vp._height));
-//        _headNode->addChild(camera);
-        
-//        auto node = Node::create();
-//        node->setPosition3D(_headNode->getPosition3D());
-//        node->setRotationQuat(_headNode->getRotationQuat());
-//        sceneNode->addChild(node);
-//        node->addChild(camera);
-    }
+    Terrain::TerrainData data("TerrainTest/heightmap16.jpg","TerrainTest/alphamap.png",r,g,b,a);
+    
+    _terrain = Terrain::create(data,Terrain::CrackFixedType::SKIRT);
+    _terrain->setLODDistance(3.2f,6.4f,9.6f);
+    _terrain->setMaxDetailMapAmount(4);
+    addChild(_terrain);
+    _terrain->setCameraMask(2);
+    _terrain->setDrawWire(false);
+    
     auto listener = EventListenerTouchOneByOne::create();
     listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
     listener->onTouchMoved = CC_CALLBACK_2(HelloWorld::onTouchMoved, this);
     listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-    CCASSERT(_headNode, "");
+    
+        //add label
+        {
+            auto label = Label::createWithSystemFont("", "Arial", 8);
+            label->setAnchorPoint(Vec2(0, 1.0));
+            label->setPosition(0, visibleSize.height);
+            //label->setCameraMask((unsigned short)CameraFlag::USER2);
+            _movementLabel = label;
+            addChild(label);
+        }
+    
 }
+
+//void HelloWorld::initScene()
+//{
+//    Size visibleSize = Director::getInstance()->getVisibleSize();
+//    auto vp = Camera::getDefaultViewport();
+//    auto sceneNode = CSLoader::createNode("res/Scene3DNoParticle.csb");
+//    sceneNode->setCameraMask((unsigned short)CameraFlag::USER1, true);
+//    addChild(sceneNode);
+//    _headNode = sceneNode->getChildByTag(57);
+//    
+//    {
+//        _originalHeadRotation = _headNode->getNodeToParentTransform();
+//        _originalHeadRotation.getTranslation(&_originalTranslation);
+//        Quaternion q;
+//        _originalHeadRotation.getRotation(&q);
+//        Mat4::createRotation(q, &_originalHeadRotation);
+//        Vec3 forward(0,0,-1);
+//        _originalHeadRotation.transformVector(&forward);
+//        forward.y = 0;
+//        forward.normalize();
+//        Mat4::createLookAt(Vec3::ZERO, forward, Vec3(0,1,0), &_originalHeadRotation);
+//        
+//    }
+//    
+//    {
+//        _camera = Camera::createPerspective(60,visibleSize.width/visibleSize.height,0.1f,800);
+//        _camera->setCameraFlag(CameraFlag::USER1);
+//        //
+//        //        _camera->setPosition3D(Vec3(-0.01,0,0));
+//        _camera->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
+//        _camera->setViewport(experimental::Viewport(vp._left,vp._bottom, vp._width, vp._height));
+//        _headNode->addChild(_camera);
+//        
+//    }
+//    
+//    //add skybox
+//    {
+//        auto textureCube = TextureCube::create("skybox/left.jpg", "skybox/right.jpg",
+//                                           "skybox/top.jpg", "skybox/bottom.jpg",
+//                                           "skybox/front.jpg", "skybox/back.jpg");
+//        auto skyBox = Skybox::create();
+//        skyBox->retain();
+//        
+//        skyBox->setTexture(textureCube);
+//        addChild(skyBox);
+//        skyBox->setCameraMask((unsigned short)CameraFlag::USER1);
+//    }
+//    
+//    //add label
+//    {
+//        auto label = Label::createWithSystemFont("", "Arial", 8);
+//        label->setAnchorPoint(Vec2(0, 1.0));
+//        label->setPosition(0, visibleSize.height);
+//        //label->setCameraMask((unsigned short)CameraFlag::USER2);
+//        _movementLabel = label;
+//        addChild(label);
+//        
+////        auto camera = Camera::createPerspective(60,visibleSize.width/visibleSize.height * 0.5,0.1f,800);
+////        camera->setCameraFlag(CameraFlag::USER2);
+////        camera->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
+////        camera->setViewport(experimental::Viewport(vp._left,vp._bottom, vp._width/2, vp._height));
+////        _headNode->addChild(camera);
+//        
+////        auto node = Node::create();
+////        node->setPosition3D(_headNode->getPosition3D());
+////        node->setRotationQuat(_headNode->getRotationQuat());
+////        sceneNode->addChild(node);
+////        node->addChild(camera);
+//    }
+//    auto listener = EventListenerTouchOneByOne::create();
+//    listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
+//    listener->onTouchMoved = CC_CALLBACK_2(HelloWorld::onTouchMoved, this);//    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+//    CCASSERT(_headNode, "");
+//}
 
 void HelloWorld::update(float delta)
 {
@@ -262,37 +324,31 @@ void HelloWorld::update(float delta)
     Quaternion q;
     transform.getRotation(&q);
     q.inverse();
-    //CCLOG("head rotation is %lf, %lf, %lf, %lf", q.x, q.y,q.z,q.w);
-    _headNode->setRotationQuat(q);
-    
-    auto v = Director::getInstance()->getDeviceMove();
+    Vec3 v = Director::getInstance()->getDeviceMove();
     auto v2 = v;
-    _originalHeadRotation.transformVector(v.x, v.y, v.z, 0, &v2);
-    _headNode->setPosition3D(_originalTranslation + v2 * _moveSpeed);
-    v2 = _headNode->getPosition3D();
+    if(_headNode)
+    {
+        //CCLOG("head rotation is %lf, %lf, %lf, %lf", q.x, q.y,q.z,q.w);
+        _headNode->setRotationQuat(q);
+        _originalHeadRotation.transformVector(v.x, v.y, v.z, 0, &v2);
+        _headNode->setPosition3D(_originalTranslation + v2 * _moveSpeed);
+        v2 = _headNode->getPosition3D();
+    }
     //CCLOG("Device move is %.6f, %.6f, %.6f", v.x, v.y, v.z);
     if(_movementLabel)
     {
-        auto str = StringUtils::format("Position %.4f, %.4f, %.4f, Speed %.4f", v2.x, v2.y, v2.z, _moveSpeed);
+        auto str = StringUtils::format("Position %.4f, %.4f, %.4f, Speed %.4f", v.x, v.y, v.z, _moveSpeed);
         _movementLabel->setString(str);
     }
-    //_headNode->setPosition3D(_headNode->getPosition3D() + v * MOVESCALE);
     
-    //add moving logic
-//    if(_isMoving)
-//    {
-//        Mat4 headTM;
-//        Mat4::createRotation(q, &headTM);
-//        Vec3 toward;
-//        headTM.transformVector(0, 0, -1, 0, &toward);
-//        toward.y = 0;
-//        toward.normalize();
-//        const float MOVE_SPEED = 2.0;
-//        Vec3 pos = _headNode->getPosition3D();
-//        pos += toward * MOVE_SPEED;
-//        _headNode->setPosition3D(pos);
-//        
-//    }
+}
+
+void HelloWorld::createBox(const cocos2d::Vec3 &pos)
+{
+    auto sprite = Sprite3D::create("vr/box.c3t", "vr/Icon.png");
+    sprite->setCameraMask((unsigned short)CameraFlag::USER1);
+    sprite->setPosition3D(pos);
+    this->addChild(sprite);
 }
 
 void HelloWorld::menuCloseCallback(Ref* sender)

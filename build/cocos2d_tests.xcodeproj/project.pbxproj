@@ -905,6 +905,8 @@
 		B284C8CA1B60EB9C0093B7AD /* res in Resources */ = {isa = PBXBuildFile; fileRef = B284C8C81B60EB9C0093B7AD /* res */; };
 		B284C8CC1B663BC80093B7AD /* skybox in Resources */ = {isa = PBXBuildFile; fileRef = B284C8CB1B663BC80093B7AD /* skybox */; };
 		B284C8CD1B663BC80093B7AD /* skybox in Resources */ = {isa = PBXBuildFile; fileRef = B284C8CB1B663BC80093B7AD /* skybox */; };
+		B2DF229A1B94485E009E57B5 /* TerrainTest in Resources */ = {isa = PBXBuildFile; fileRef = B2DF22991B94485E009E57B5 /* TerrainTest */; };
+		B2DF229B1B94485E009E57B5 /* TerrainTest in Resources */ = {isa = PBXBuildFile; fileRef = B2DF22991B94485E009E57B5 /* TerrainTest */; };
 		B5CE6DD11B3C08F8002B0419 /* UIRadioButtonTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5CE6DCD1B3C08F8002B0419 /* UIRadioButtonTest.cpp */; };
 		B5CE6DD21B3C08F8002B0419 /* UIRadioButtonTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5CE6DCD1B3C08F8002B0419 /* UIRadioButtonTest.cpp */; };
 		B603F1AF1AC8EA4E00A9579C /* TerrainTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B603F1AD1AC8EA4E00A9579C /* TerrainTest.cpp */; };
@@ -1965,6 +1967,7 @@
 		B284C8C51B608D800093B7AD /* vr */ = {isa = PBXFileReference; lastKnownFileType = folder; name = vr; path = "../tests/cpp-empty-test/Resources/vr"; sourceTree = "<group>"; };
 		B284C8C81B60EB9C0093B7AD /* res */ = {isa = PBXFileReference; lastKnownFileType = folder; name = res; path = "../tests/cpp-empty-test/Resources/res"; sourceTree = "<group>"; };
 		B284C8CB1B663BC80093B7AD /* skybox */ = {isa = PBXFileReference; lastKnownFileType = folder; name = skybox; path = "../tests/cpp-empty-test/Resources/skybox"; sourceTree = "<group>"; };
+		B2DF22991B94485E009E57B5 /* TerrainTest */ = {isa = PBXFileReference; lastKnownFileType = folder; name = TerrainTest; path = "../tests/cpp-empty-test/Resources/TerrainTest"; sourceTree = "<group>"; };
 		B5CE6DCD1B3C08F8002B0419 /* UIRadioButtonTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIRadioButtonTest.cpp; sourceTree = "<group>"; };
 		B5CE6DCE1B3C08F8002B0419 /* UIRadioButtonTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIRadioButtonTest.h; sourceTree = "<group>"; };
 		B603F1AD1AC8EA4E00A9579C /* TerrainTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TerrainTest.cpp; path = TerrainTest/TerrainTest.cpp; sourceTree = "<group>"; };
@@ -2511,6 +2514,7 @@
 		1AC358FD18CEC1EF00F37B72 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				B2DF22991B94485E009E57B5 /* TerrainTest */,
 				B284C8CB1B663BC80093B7AD /* skybox */,
 				B284C8C81B60EB9C0093B7AD /* res */,
 				B284C8C51B608D800093B7AD /* vr */,
@@ -4843,6 +4847,7 @@
 				1AC3590718CEC1FB00F37B72 /* ipad in Resources */,
 				1AC3590B18CEC1FB00F37B72 /* iphone in Resources */,
 				1AC358F818CEC1D400F37B72 /* Icon.icns in Resources */,
+				B2DF229A1B94485E009E57B5 /* TerrainTest in Resources */,
 				1AC3590518CEC1FB00F37B72 /* fonts in Resources */,
 				1AC358F618CEC1D400F37B72 /* MainMenu.xib in Resources */,
 				B284C8C61B608D800093B7AD /* vr in Resources */,
@@ -4869,6 +4874,7 @@
 				1AC358DD18CEC1CB00F37B72 /* Default@2x.png in Resources */,
 				1AC358E018CEC1CB00F37B72 /* Icon-114.png in Resources */,
 				1AC3590418CEC1FB00F37B72 /* bang.png in Resources */,
+				B2DF229B1B94485E009E57B5 /* TerrainTest in Resources */,
 				1AC3590A18CEC1FB00F37B72 /* ipadhd in Resources */,
 				1AC3590C18CEC1FB00F37B72 /* iphone in Resources */,
 				1AC358E818CEC1CB00F37B72 /* Icon-76.png in Resources */,
