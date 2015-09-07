@@ -22,9 +22,9 @@ protected:
     virtual void onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *evt) override;
     virtual void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *evt) override;
     
-private:
-    void createBox(const cocos2d::Vec3& pos);
 protected:
+    void createBox(const cocos2d::Vec3& pos);
+    cocos2d::Vec3 getPickPosition() const;
     void initScene();
 private:
     cocos2d::Terrain* _terrain;
@@ -32,6 +32,13 @@ private:
     cocos2d::Camera* _camera2;
     cocos2d::Node* _headNode;
     cocos2d::Node* _objectNode;
+    cocos2d::AABB _boxAABB;
+    cocos2d::Label* _movementLabel;// = nullptr;
+    cocos2d::Mat4 _originalHeadRotation;// = Mat4::IDENTITY;
+    cocos2d::Vec3 _originalTranslation;// = Vec3::ZERO;
+    float _moveSpeed = 5.0;
+    
+    int _boxArray[100][100][100];
     bool _isMoving;
 };
 
