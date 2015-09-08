@@ -155,7 +155,7 @@ void HelloWorld::initScene()
         memset(&_boxArray[0][0][0], 0, sizeof(_boxArray));
     }
     
-    Terrain::DetailMap r("TerrainTest/dirt.jpg"),g("TerrainTest/Grass2.jpg"),b("TerrainTest/road.jpg"),a("TerrainTest/GreenSkin.jpg");
+    Terrain::DetailMap r("TerrainTest/Grass2.jpg"),g("TerrainTest/Grass2.jpg"),b("TerrainTest/Grass2.jpg"),a("TerrainTest/Grass2.jpg");
     
     Terrain::TerrainData data("TerrainTest/heightmap16.jpg","TerrainTest/alphamap.png",r,g,b,a);
     
@@ -177,16 +177,20 @@ void HelloWorld::initScene()
         auto label = Label::createWithSystemFont("", "Arial", 8);
         label->setAnchorPoint(Vec2(0, 1.0));
         label->setPosition(0, visibleSize.height);
-        //label->setCameraMask((unsigned short)CameraFlag::USER2);
         _movementLabel = label;
         addChild(label);
+        
+        auto label2 = Label::createWithSystemFont("o", "Arial", 8);
+        label2->setPosition(visibleSize.width/2, visibleSize.height/2);
+        addChild(label2);
     }
     //add demo box
     {
-        auto sprite = Sprite3D::create("vr/box.c3t", "vr/Icon.png");
+        auto sprite = Sprite3D::create("vr/box.c3t", "vr/GreenSkin.jpg");
         sprite->setCameraMask((unsigned short)CameraFlag::USER1);
         sprite->setPosition3D(Vec3::ZERO);
-        sprite->setColor(Color3B(0,255,0));
+        //sprite->setColor(Color3B(0,255,0));
+        sprite->setOpacity(127);
         this->addChild(sprite);
         _objectNode = sprite;
     }
@@ -303,7 +307,7 @@ void HelloWorld::update(float delta)
 
 void HelloWorld::createBox(const cocos2d::Vec3 &pos)
 {
-    auto sprite = Sprite3D::create("vr/box.c3t", "vr/Icon.png");
+    auto sprite = Sprite3D::create("vr/box.c3t", "vr/GreenSkin.jpg");
     sprite->setCameraMask((unsigned short)CameraFlag::USER1);
     sprite->setPosition3D(pos);
     this->addChild(sprite);
