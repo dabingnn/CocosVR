@@ -71,7 +71,7 @@ Vec3 HelloWorld::getPickPosition() const
     float step = _boxAABB._max.x - _boxAABB._min.x;
     const float MAXLENGTH = 12;
     const float MINLENGTH = 4;
-    const float WALKSTEP = 0.1;
+    const float WALKSTEP = 0.2;
     float stepX = (_boxAABB._max.x - _boxAABB._min.x);
     float stepY = (_boxAABB._max.y - _boxAABB._min.y);
     float stepZ = (_boxAABB._max.z - _boxAABB._min.z);
@@ -139,7 +139,7 @@ void HelloWorld::initScene()
     _headNode->addChild(_camera);
     addChild(_headNode);
     
-    //_camera->runAction(RepeatForever::create(RotateBy::create(2, Vec3(0,50,0))));
+    //_camera->runAction(RepeatForever::create(RotateBy::create(10, Vec3(0,50,0))));
     
     {
         _originalHeadRotation = _headNode->getNodeToParentTransform();
@@ -193,9 +193,13 @@ void HelloWorld::initScene()
         _movementLabel = label;
         addChild(label);
         
-        auto label2 = Label::createWithSystemFont("o", "Arial", 8);
-        label2->setPosition(visibleSize.width/2, visibleSize.height/2);
-        addChild(label2);
+        auto sprite = Sprite3D::create("vr/box.c3t", "vr/GreenSkin.jpg");
+        sprite->setCameraMask((unsigned short)CameraFlag::USER1);
+        sprite->setPosition3D(Vec3::ZERO);
+        sprite->setColor(Color3B(0,255,0));
+        sprite->setScale(0.01);
+        _camera->addChild(sprite);
+        sprite->setPosition3D(Vec3(0,0, -1));
     }
     //add demo box
     {
