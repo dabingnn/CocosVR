@@ -61,6 +61,7 @@ Vec3 HelloWorld::getPickPosition() const
 {
     Vec3 result(-10000,-10000,-10000);
     auto transform = _camera->getNodeToWorldTransform();
+    //auto terrainTM = _terrain->getNodeToWorldTransform();
     Vec3 pos(0,0,0);
     transform.transformPoint(&pos);
     Vec3 dir(0,0,-1);
@@ -68,15 +69,16 @@ Vec3 HelloWorld::getPickPosition() const
     dir.normalize();
     Ray ray(pos, dir);
     float step = _boxAABB._max.x - _boxAABB._min.x;
-    const int MAXSTEP = 12;
-    const int MINSTEP = 4;
+    const float MAXLENGTH = 12;
+    const float MINLENGTH = 4;
+    const float WALKSTEP = 0.1;
     float stepX = (_boxAABB._max.x - _boxAABB._min.x);
     float stepY = (_boxAABB._max.y - _boxAABB._min.y);
     float stepZ = (_boxAABB._max.z - _boxAABB._min.z);
     bool isIntersect(false);
     int interSectX; int interSectY; int interSectZ;
     Vec3 intesectPoint;
-    for(int index = MINSTEP; index <= MAXSTEP; ++index)
+    for(float index = MINLENGTH; index <= MAXLENGTH;)
     {
         Vec3 stepPos = pos + dir * index * step;
         int x = (stepPos.x)/stepX;
@@ -93,6 +95,7 @@ Vec3 HelloWorld::getPickPosition() const
         {
             break;
         }
+        index += WALKSTEP;
     }
     
     if(isIntersect)
@@ -130,10 +133,13 @@ void HelloWorld::initScene()
     _camera = Camera::createPerspective(60,visibleSize.width/visibleSize.height,0.1f,800);
     _camera->setCameraFlag(CameraFlag::USER1);
     _camera->setPosition3D(Vec3(-1,5.0f,4));
+    //_camera->setRotation3D(Vec3(-50,0,0));
     _camera->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
     _camera->setViewport(experimental::Viewport(vp._left,vp._bottom, vp._width, vp._height));
     _headNode->addChild(_camera);
     addChild(_headNode);
+    
+    //_camera->runAction(RepeatForever::create(RotateBy::create(2, Vec3(0,50,0))));
     
     {
         _originalHeadRotation = _headNode->getNodeToParentTransform();
@@ -153,6 +159,13 @@ void HelloWorld::initScene()
         auto sprite = Sprite3D::create("vr/box.c3t", "vr/Icon.png");
         _boxAABB = sprite->getAABB();
         memset(&_boxArray[0][0][0], 0, sizeof(_boxArray));
+        for(int indexX = 0; indexX < 100; ++indexX)
+        {
+            for(int indexZ = 0; indexZ < 100; ++indexZ)
+            {
+                _boxArray[indexX][49][indexZ] = true;
+            }
+        }
     }
     
     Terrain::DetailMap r("TerrainTest/Grass2.jpg"),g("TerrainTest/Grass2.jpg"),b("TerrainTest/Grass2.jpg"),a("TerrainTest/Grass2.jpg");
@@ -301,6 +314,34 @@ void HelloWorld::update(float delta)
         float stepY = (_boxAABB._max.y - _boxAABB._min.y);
         float stepZ = (_boxAABB._max.z - _boxAABB._min.z);
         _objectNode->setPosition3D(Vec3((pickPos.x - 50)* stepX, (pickPos.y - 50)* stepY, (pickPos.z - 50)* stepZ));
+    }
+    
+//    {
+//        Vec3 result(-10000,-10000,-10000);
+//        auto transform = _camera->getNodeToWorldTransform();
+//        //auto terrainTM = _terrain->getNodeToWorldTransform();
+//        Vec3 pos(0,0,0);
+//        transform.transformPoint(&pos);
+//        Vec3 dir(0,0,-1);
+//        transform.transformVector(&dir);
+//        dir.normalize();
+//        Ray ray(pos, dir);
+//        _objectNode->setPosition3D(Vec3(pos + dir * 5));
+//    }
+    
+    {
+        auto transform = _camera->getNodeToWorldTransform();
+        Vec3 pos(0,0,0);
+        transform.transformPoint(&pos);
+        Vec3 dir(0,0,-1);
+        transform.transformVector(&dir);
+        dir.normalize();
+        Ray ray(pos, dir);
+        Vec3 pt;
+        if(_terrain->getIntersectionPoint(ray, pt))
+        {
+            CCLOG("Terrain is picked %.3f, %.3f, %.3f", pt.x, pt.y, pt.z);
+        }
     }
     
 }
