@@ -2,6 +2,7 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
+#include <string>
 
 class HelloWorld : public cocos2d::Layer
 {
@@ -23,7 +24,7 @@ protected:
     virtual void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *evt) override;
     
 protected:
-    void createBox(const cocos2d::Vec3& pos);
+    Node* createBox();
     cocos2d::Vec3 getPickPosition() const;
     void initScene();
 private:
@@ -40,6 +41,9 @@ private:
     
     int _boxArray[100][100][100];
     bool _isMoving;
+    
+    std::vector<std::string> _boxTextureNames;
+    int _selectedTextureNameIndex;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

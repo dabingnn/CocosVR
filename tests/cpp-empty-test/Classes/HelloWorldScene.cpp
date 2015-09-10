@@ -117,7 +117,13 @@ void HelloWorld::onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *evt)
         float stepX = (_boxAABB._max.x - _boxAABB._min.x);
         float stepY = (_boxAABB._max.y - _boxAABB._min.y);
         float stepZ = (_boxAABB._max.z - _boxAABB._min.z);
-        createBox(Vec3((pickPos.x - 50)* stepX, (pickPos.y - 50)* stepY, (pickPos.z - 50)* stepZ));
+        auto sprite = createBox();
+        if(sprite)
+        {
+            sprite->setPosition3D(Vec3((pickPos.x - 50)* stepX, (pickPos.y - 50)* stepY, (pickPos.z - 50)* stepZ));
+            this->addChild(sprite);
+        }
+        
     }
     evt->stopPropagation();
     
@@ -138,6 +144,44 @@ void HelloWorld::initScene()
     _camera->setViewport(experimental::Viewport(vp._left,vp._bottom, vp._width, vp._height));
     _headNode->addChild(_camera);
     addChild(_headNode);
+    {
+        //_boxTextureNames.push_back("vr/Icon.png");
+        _boxTextureNames.push_back("vr/GreenSkin.jpg");
+        _boxTextureNames.push_back("vr/sand.jpg");
+        _boxTextureNames.push_back("vr/road.jpg");
+        _selectedTextureNameIndex = 0;
+    }
+    
+    {
+//        auto label = Label::createWithTTF(ttfConfig, "Back");
+//        
+//        auto menuItem = MenuItemLabel::create(label, std::bind(&TestBase::backsUpOneLevel, this));
+//        auto menu = Menu::create(menuItem, nullptr);
+//        
+//        menu->setPosition(Vec2::ZERO);
+//        menuItem->setPosition(Vec2(VisibleRect::right().x - 50, VisibleRect::bottom().y + 25));
+//        
+//        scene->addChild(menu, 1);
+        auto label = Label::createWithSystemFont("Switch Box", "Arial", 16);
+        auto menuItem = MenuItemLabel::create(label,
+                                              [this](Ref* ref)
+                                              {
+                                                  _selectedTextureNameIndex++;
+                                                  _selectedTextureNameIndex = _selectedTextureNameIndex%_boxTextureNames.size();
+                                                  auto sprite = createBox();
+                                                  this->addChild(sprite);
+                                                  this->removeChild(_objectNode);
+                                                  _objectNode = sprite;
+                                                  _objectNode->setPosition3D(Vec3::ZERO);
+                                                  _objectNode->setOpacity(127);
+                                              }
+                                              );
+        auto menu = Menu::create(menuItem, nullptr);
+        menu->setPosition(Vec2::ZERO);
+        menuItem->setPosition(Vec2(visibleSize.width - 50, 25));
+        
+        this->addChild(menu);
+    }
     
     //_camera->runAction(RepeatForever::create(RotateBy::create(10, Vec3(0,50,0))));
     
@@ -203,13 +247,11 @@ void HelloWorld::initScene()
     }
     //add demo box
     {
-        auto sprite = Sprite3D::create("vr/box.c3t", "vr/GreenSkin.jpg");
-        sprite->setCameraMask((unsigned short)CameraFlag::USER1);
-        sprite->setPosition3D(Vec3::ZERO);
+        _objectNode = createBox();
+        _objectNode->setPosition3D(Vec3::ZERO);
         //sprite->setColor(Color3B(0,255,0));
-        sprite->setOpacity(127);
-        this->addChild(sprite);
-        _objectNode = sprite;
+        _objectNode->setOpacity(127);
+        this->addChild(_objectNode);
     }
     
 }
@@ -350,12 +392,12 @@ void HelloWorld::update(float delta)
     
 }
 
-void HelloWorld::createBox(const cocos2d::Vec3 &pos)
+Node* HelloWorld::createBox()
 {
-    auto sprite = Sprite3D::create("vr/box.c3t", "vr/GreenSkin.jpg");
+    auto sprite = Sprite3D::create("vr/box.c3t", _boxTextureNames[_selectedTextureNameIndex]);
     sprite->setCameraMask((unsigned short)CameraFlag::USER1);
-    sprite->setPosition3D(pos);
-    this->addChild(sprite);
+    //sprite->setPosition3D(pos);
+    return sprite;
 }
 
 void HelloWorld::menuCloseCallback(Ref* sender)
