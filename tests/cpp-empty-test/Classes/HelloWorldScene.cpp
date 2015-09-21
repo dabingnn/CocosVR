@@ -145,7 +145,7 @@ void HelloWorld::initScene()
     _headNode->addChild(_camera);
     addChild(_headNode);
     {
-        //_boxTextureNames.push_back("vr/Icon.png");
+        _boxTextureNames.push_back("vr/Icon.png");
         _boxTextureNames.push_back("vr/GreenSkin.jpg");
         _boxTextureNames.push_back("vr/sand.jpg");
         _boxTextureNames.push_back("vr/road.jpg");
