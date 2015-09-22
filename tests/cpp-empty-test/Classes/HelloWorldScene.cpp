@@ -152,7 +152,7 @@ bool HelloWorld::init()
 static cocos2d::Label* _movementLabel = nullptr;
 static cocos2d::Mat4 _originalHeadRotation = Mat4::IDENTITY;
 static cocos2d::Vec3 _originalTranslation = Vec3::ZERO;
-static float _moveSpeed = 5.0;
+static float _moveSpeed = 60;
 
 bool HelloWorld::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *evt)
 {
@@ -201,9 +201,9 @@ bool HelloWorld::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *evt)
 
 void HelloWorld::onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *evt)
 {
-    auto delta = touch->getDelta();
-    _moveSpeed += delta.x/10;
-    _moveSpeed = clampf(_moveSpeed, 5, 100);
+    // auto delta = touch->getDelta();
+    // _moveSpeed += delta.x/10;
+    // _moveSpeed = clampf(_moveSpeed, 5, 100);
 }
 
 void HelloWorld::onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *evt)
