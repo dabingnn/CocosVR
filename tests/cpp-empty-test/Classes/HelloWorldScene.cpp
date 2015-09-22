@@ -156,7 +156,46 @@ static float _moveSpeed = 5.0;
 
 bool HelloWorld::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *evt)
 {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    auto vp = Camera::getDefaultViewport();
     //_isMoving = true;
+    _isVRMode = !_isVRMode;
+    if(!_headNode) return true;
+    {
+        if(_camera)     _camera->setFrameBufferObject(nullptr);
+        if(_camera2)    _camera2->setFrameBufferObject(nullptr);
+        _headNode->removeAllChildren();
+        _camera = _camera2 = nullptr;
+    }
+    if(_isVRMode)
+    {
+        _camera = Camera::createPerspective(60,visibleSize.width/visibleSize.height * 0.5,0.1f,800);
+        _camera->setCameraFlag(CameraFlag::USER1);
+        //
+        //        _camera->setPosition3D(Vec3(-0.01,0,0));
+        _camera->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
+        _camera->setViewport(experimental::Viewport(vp._left,vp._bottom, vp._width/2, vp._height));
+        _headNode->addChild(_camera);
+        
+        _camera2 = Camera::createPerspective(60,visibleSize.width/visibleSize.height * 0.5,0.1f,800);
+        _camera2->setCameraFlag(CameraFlag::USER1);
+        //
+        //        _camera->setPosition3D(Vec3(-0.01,0,0));
+        _camera2->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
+        _camera2->setViewport(experimental::Viewport(vp._left + vp._width/2,vp._bottom, vp._width/2, vp._height));
+        _headNode->addChild(_camera2);
+    }
+    else
+    {
+        _camera = Camera::createPerspective(60,visibleSize.width/visibleSize.height,0.1f,800);
+        _camera->setCameraFlag(CameraFlag::USER1);
+        //
+        //        _camera->setPosition3D(Vec3(-0.01,0,0));
+        _camera->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
+        _camera->setViewport(experimental::Viewport(vp._left,vp._bottom, vp._width, vp._height));
+        _headNode->addChild(_camera);
+    }
+    evt->stopPropagation();
     return true;
 }
 
@@ -195,7 +234,7 @@ void HelloWorld::initScene()
         Mat4::createLookAt(Vec3::ZERO, forward, Vec3(0,1,0), &_originalHeadRotation);
         
     }
-    
+        _isVRMode = true;
     {
         _camera = Camera::createPerspective(60,visibleSize.width/visibleSize.height * 0.5,0.1f,800);
         _camera->setCameraFlag(CameraFlag::USER1);

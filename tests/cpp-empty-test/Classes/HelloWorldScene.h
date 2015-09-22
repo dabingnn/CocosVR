@@ -29,7 +29,7 @@ private:
     cocos2d::Camera* _camera2;
     cocos2d::Node* _headNode;
     cocos2d::Node* _objectNode;
-    bool _isMoving;
+    bool _isVRMode;
 };
 
 #endif // __HELLOWORLD_SCENE_H__
