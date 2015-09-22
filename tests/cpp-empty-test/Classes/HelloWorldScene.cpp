@@ -35,6 +35,7 @@ bool HelloWorld::init()
         _movementLabel = nullptr;
         _originalHeadRotation = Mat4::IDENTITY;
         _originalTranslation = Vec3::ZERO;
+        _moveSpeed = 15;
     }
     
     initScene();
@@ -50,9 +51,9 @@ bool HelloWorld::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *evt)
 
 void HelloWorld::onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *evt)
 {
-    auto delta = touch->getDelta();
-    _moveSpeed += delta.x/10;
-    _moveSpeed = clampf(_moveSpeed, 5, 100);
+    //auto delta = touch->getDelta();
+    //_moveSpeed += delta.x/10;
+    //_moveSpeed = clampf(_moveSpeed, 5, 100);
     
 }
 
