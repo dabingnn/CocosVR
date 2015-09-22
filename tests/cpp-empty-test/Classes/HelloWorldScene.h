@@ -24,6 +24,8 @@ protected:
     virtual void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *evt) override;
     
 protected:
+    void switchVRMode(cocos2d::Ref* ref);
+protected:
     Node* createBox();
     cocos2d::Vec3 getPickPosition() const;
     void initScene();
@@ -40,7 +42,7 @@ private:
     float _moveSpeed = 5.0;
     
     int _boxArray[100][100][100];
-    bool _isMoving;
+    bool _isVRMode;
     
     std::vector<std::string> _boxTextureNames;
     int _selectedTextureNameIndex;

@@ -45,7 +45,6 @@ bool HelloWorld::init()
 
 bool HelloWorld::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *evt)
 {
-    //_isMoving = true;
     return true;
 }
 
@@ -129,20 +128,73 @@ void HelloWorld::onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *evt)
     
 }
 
+void HelloWorld::switchVRMode(cocos2d::Ref *ref)
+{
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    auto vp = Camera::getDefaultViewport();
+    //_isMoving = true;
+    if(nullptr == _headNode) return;
+    _isVRMode = !_isVRMode;
+    {
+        if(_camera) _camera->setFrameBufferObject(nullptr);
+        if(_camera2) _camera2->setFrameBufferObject(nullptr);
+        _headNode->removeAllChildren();
+        _camera = _camera2 = nullptr;
+    }
+    
+    if(_isVRMode)
+    {
+        //use custom camera
+        _camera = Camera::createPerspective(60,visibleSize.width/visibleSize.height * 0.5,0.1f,800);
+        _camera->setCameraFlag(CameraFlag::USER1);
+        _camera->setPosition3D(Vec3(-1,5.0f,4));
+        //_camera->setRotation3D(Vec3(-50,0,0));
+        _camera->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
+        _camera->setViewport(experimental::Viewport(vp._left,vp._bottom, vp._width/2, vp._height));
+        _headNode->addChild(_camera);
+        
+        
+        //use custom camera
+        _camera2 = Camera::createPerspective(60,visibleSize.width/visibleSize.height * 0.5,0.1f,800);
+        _camera2->setCameraFlag(CameraFlag::USER1);
+        _camera2->setPosition3D(Vec3(-1,5.0f,4));
+        //_camera->setRotation3D(Vec3(-50,0,0));
+        _camera2->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
+        _camera2->setViewport(experimental::Viewport(vp._left + vp._width/2,vp._bottom, vp._width/2, vp._height));
+        _headNode->addChild(_camera2);
+    }
+    else
+    {
+        //use custom camera
+        _camera = Camera::createPerspective(60,visibleSize.width/visibleSize.height,0.1f,800);
+        _camera->setCameraFlag(CameraFlag::USER1);
+        _camera->setPosition3D(Vec3(-1,5.0f,4));
+        //_camera->setRotation3D(Vec3(-50,0,0));
+        _camera->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
+        _camera->setViewport(experimental::Viewport(vp._left,vp._bottom, vp._width, vp._height));
+        _headNode->addChild(_camera);
+    }
+}
+
 void HelloWorld::initScene()
 {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     auto vp = Camera::getDefaultViewport();
     _headNode = Node::create();
     
-    //use custom camera
-    _camera = Camera::createPerspective(60,visibleSize.width/visibleSize.height,0.1f,800);
-    _camera->setCameraFlag(CameraFlag::USER1);
-    _camera->setPosition3D(Vec3(-1,5.0f,4));
-    //_camera->setRotation3D(Vec3(-50,0,0));
-    _camera->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
-    _camera->setViewport(experimental::Viewport(vp._left,vp._bottom, vp._width, vp._height));
-    _headNode->addChild(_camera);
+
+    
+    {
+        //use custom camera
+        _camera = Camera::createPerspective(60,visibleSize.width/visibleSize.height,0.1f,800);
+        _camera->setCameraFlag(CameraFlag::USER1);
+        _camera->setPosition3D(Vec3(-1,5.0f,4));
+        //_camera->setRotation3D(Vec3(-50,0,0));
+        _camera->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
+        _camera->setViewport(experimental::Viewport(vp._left,vp._bottom, vp._width, vp._height));
+        _headNode->addChild(_camera);
+    }
+    
     addChild(_headNode);
     {
         _boxTextureNames.push_back("vr/Icon.png");
@@ -178,9 +230,18 @@ void HelloWorld::initScene()
                                               );
         auto menu = Menu::create(menuItem, nullptr);
         menu->setPosition(Vec2::ZERO);
-        menuItem->setPosition(Vec2(visibleSize.width - 50, 25));
+        menuItem->setPosition(Vec2(visibleSize.width - 50, 50));
         
         this->addChild(menu);
+        
+        auto label2 = Label::createWithSystemFont("Switch Mode", "Arial", 16);
+        auto menuItem2 = MenuItemLabel::create(label2, CC_CALLBACK_1(HelloWorld::switchVRMode,this));
+        auto menu2 = Menu::create(menuItem2, nullptr);
+        menu2->setPosition(Vec2::ZERO);
+        menuItem2->setPosition(Vec2(visibleSize.width - 50, 25));
+        
+        this->addChild(menu2);
+        
     }
     
     //_camera->runAction(RepeatForever::create(RotateBy::create(10, Vec3(0,50,0))));
