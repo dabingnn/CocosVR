@@ -36,6 +36,7 @@ bool HelloWorld::init()
         _originalHeadRotation = Mat4::IDENTITY;
         _originalTranslation = Vec3::ZERO;
         _moveSpeed = 15;
+        _isVRMode = false;
     }
     
     initScene();
@@ -110,20 +111,23 @@ Vec3 HelloWorld::getPickPosition() const
 
 void HelloWorld::onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *evt)
 {
-    auto pickPos = getPickPosition();
-    if(pickPos.x >=0 && pickPos.x < 100 && pickPos.y >=0 && pickPos.y < 100 && pickPos.z >=0 && pickPos.z < 100)
+    if(!_isVRMode)
     {
-        _boxArray[(unsigned int)pickPos.x][(unsigned int)pickPos.y][(unsigned int)pickPos.z] = true;
-        float stepX = (_boxAABB._max.x - _boxAABB._min.x);
-        float stepY = (_boxAABB._max.y - _boxAABB._min.y);
-        float stepZ = (_boxAABB._max.z - _boxAABB._min.z);
-        auto sprite = createBox();
-        if(sprite)
+        auto pickPos = getPickPosition();
+        if(pickPos.x >=0 && pickPos.x < 100 && pickPos.y >=0 && pickPos.y < 100 && pickPos.z >=0 && pickPos.z < 100)
         {
-            sprite->setPosition3D(Vec3((pickPos.x - 50)* stepX, (pickPos.y - 50)* stepY, (pickPos.z - 50)* stepZ));
-            this->addChild(sprite);
+            _boxArray[(unsigned int)pickPos.x][(unsigned int)pickPos.y][(unsigned int)pickPos.z] = true;
+            float stepX = (_boxAABB._max.x - _boxAABB._min.x);
+            float stepY = (_boxAABB._max.y - _boxAABB._min.y);
+            float stepZ = (_boxAABB._max.z - _boxAABB._min.z);
+            auto sprite = createBox();
+            if(sprite)
+            {
+                sprite->setPosition3D(Vec3((pickPos.x - 50)* stepX, (pickPos.y - 50)* stepY, (pickPos.z - 50)* stepZ));
+                this->addChild(sprite);
+            }
+            
         }
-        
     }
     evt->stopPropagation();
     
@@ -163,6 +167,8 @@ void HelloWorld::switchVRMode(cocos2d::Ref *ref)
         _camera2->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
         _camera2->setViewport(experimental::Viewport(vp._left + vp._width/2,vp._bottom, vp._width/2, vp._height));
         _headNode->addChild(_camera2);
+
+        _objectNode->setVisible(false);   
     }
     else
     {
@@ -174,6 +180,7 @@ void HelloWorld::switchVRMode(cocos2d::Ref *ref)
         _camera->setFrameBufferObject(Director::getInstance()->getDefaultFBO());
         _camera->setViewport(experimental::Viewport(vp._left,vp._bottom, vp._width, vp._height));
         _headNode->addChild(_camera);
+        _objectNode->setVisible(true);
     }
 }
 
@@ -227,6 +234,10 @@ void HelloWorld::initScene()
                                                   _objectNode = sprite;
                                                   _objectNode->setPosition3D(Vec3::ZERO);
                                                   _objectNode->setOpacity(127);
+                                                  if(_isVRMode)
+                                                  {
+                                                    _objectNode->setVisible(false);
+                                                  }
                                               }
                                               );
         auto menu = Menu::create(menuItem, nullptr);
